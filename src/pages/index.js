@@ -1,118 +1,133 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ subsets: ['latin'] })
+import { useForm, Controller } from "react-hook-form";
+//yarn add @material-ui/core でコンテンツの表示領域と余白を調整
+import Container from "@material-ui/core/Container";
+//名前の入力欄をMaterial-uiのText Inputに置換える ※そのまま使用するとreacthookの機能が使えなくなる
+import Input from "@material-ui/core/Input";
 
 export default function Home() {
+  //useFormを実行しregister,handleSubmitを取得
+  //formState:{errors}でエラーの有無によってメッセージを発生させる
+  //useFormとControllerを紐付ける為にcontrolをuseFormより取得、Materialのinputに置き換え
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+    watch,
+  } = useForm();
+
+  const onSubmit = (data) => {
+    console.log(data);
+  };
+  const learningValues = watch(["isLearning", "wasLearning"]);
+  console.log(typeof learningValues[0]);
+
+  const isLearning = learningValues[0];
+  const wasLearning = learningValues[1];
+
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/pages/index.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+    <>
+      <Container>
+        <h1>プログラミング学習に関するアンケート</h1>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div>
+            <label htmlFor="name">Q1. 名前を入力してください(匿名可)。</label>
+            <Controller
+              name="name"
+              defaultValue=""
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <Input value={value} onChange={onChange} />
+              )}
+              // {...register("name")}
             />
-          </a>
-        </div>
-      </div>
+          </div>
+          <div>
+            <label htmlFor="birth">
+              Q2. 生年月日を入力してください。(例:19900101)
+            </label>
+            <Controller
+              name="birth"
+              defaultValue=""
+              control={control}
+              rules={{ required: true, pattern: /[0-9]{8}$/ }}
+              render={({ field: { value, onChange } }) => (
+                <Input value={value} onChange={onChange} />
+              )}
+            />
+            {errors.birth && errors.birth.type === "required" ? (
+              <span>このフィールドは回答必須です。</span>
+            ) : null}
+            {errors.birth && errors.birth.type === "pattern" ? (
+              <span>整数8桁で入力してください。</span>
+            ) : null}
+          </div>
+          <div>
+            <span>Q3. 現在、プログラミングを学習していますか？</span>
+            <input
+              id="isLearning1"
+              {...register("isLearning", { required: true })}
+              name="isLearning"
+              type="radio"
+              value="true"
+            />
+            <label htmlFor="isLearning1">はい</label>
+            <input
+              id="isLearning2"
+              {...register("isLearning", { required: true })}
+              name="isLearning"
+              type="radio"
+              value="false"
+            />
+            <label htmlFor="isLearning2">いいえ</label>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
+            {errors.isLearning && <span>このフィールドは回答必須です。</span>}
+          </div>
+          <div>
+            <span>
+              Q4. これまでに、プログラミングを学習したことがありますか？
             </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+            <input
+              id="wasLearning1"
+              {...register("wasLearning", { required: true })}
+              name="wasLearning"
+              type="radio"
+              value="true"
+            />
+            <label htmlFor="wasLearning1">はい</label>
+            <input
+              id="wasLearning2"
+              {...register("wasLearning", { required: true })}
+              name="wasLearning"
+              type="radio"
+              value="false"
+            />
+            <label htmlFor="wasLearning2">いいえ</label>
+            {errors.wasLearning && <span>このフィールドは回答必須です。</span>}
+          </div>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+          {(isLearning === "true" || wasLearning === "true") && (
+            <div>
+              <label htmlFor="name">
+                Q5.今まで学習したことのあるプログラミング言語をすべて教えてください。
+              </label>
+              <Controller
+                name="name"
+                defaultValue=""
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <Input value={value} onChange={onChange} />
+                )}
+              />
+            </div>
+          )}
+          <input type="submit" value="アンケートを提出する" />
+        </form>
+      </Container>
+    </>
+  );
 }
+
+//Q17の名前・生年月日をMaterial UI inputに置換える意味　...register無くなっていいのか
+//Q19 はいの場合の実装
+//Q20 firestoreを導入しDBに記録
